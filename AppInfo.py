@@ -88,8 +88,7 @@ def GetAllApps():
 				print(" *** Application Data Obfuscated (Apple Application) ***")
 			print(" Directory: " + y)
 			print("")
-
-		
+			
 	
 def Help():
 	print("")
