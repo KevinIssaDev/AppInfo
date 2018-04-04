@@ -7,3 +7,4 @@ Get information about all your installed applications, in seconds.
  -a, --all    Print information of all installed applications.
  -i, --info   Print information of specified application.
  -h, --help   Print this message.
+
