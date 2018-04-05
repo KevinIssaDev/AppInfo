@@ -76,6 +76,7 @@ def GetApp(appName):
 		print(" Application does not exist.")
 		print("")
 	
+
 def CopyBundleId(appName):
 	if appName in pathDict:
 		appNameApp = "%s.app" % appName
