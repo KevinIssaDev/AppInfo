@@ -31,8 +31,8 @@ def PrintInfo(path):
 	print(" Minimum iOS: " + pl["MinimumOSVersion"])
 	print(" Binary name: " + pl["CFBundleExecutable"])
 	print(" Bundle Identifier: " + pl["CFBundleIdentifier"])
-	
 
+	
 def GetAllAppInfo():
 	print('')
 	path = "/var/mobile/Containers/Bundle/Application"
@@ -49,7 +49,14 @@ def GetAllAppInfo():
 			appNameDir = dirNamePretty[0]
 			pathDict[appNameDir] = dirSerial
 
+			
+def GetCopyBundle(path):
+	fp = open(path, 'rb')
+	pl = plistlib.readPlist(fp)
+	print(" \"%s\" copied to clipboard." % pl["CFBundleIdentifier"])
+	os.system("pbcopy %s" % pl["CFBundleIdentifier"])
 
+	
 def GetApp(appName): 
 	if appName in pathDict:
 		appNameApp = "%s.app" % appName
@@ -69,7 +76,23 @@ def GetApp(appName):
 		print(" Application does not exist.")
 		print("")
 	
-	
+def CopyBundleId(appName):
+	if appName in pathDict:
+		appNameApp = "%s.app" % appName
+		appPath = "/var/mobile/Containers/Bundle/Application/%s/%s/" % (pathDict[appName], appNameApp)
+		infoPath = "/var/mobile/Containers/Bundle/Application/%s/%s/Info.plist" % (pathDict[appName], appNameApp)
+		infoFile = open(infoPath, 'r').read()
+		
+		appName = re.findall(r'bplist', infoFile)
+		
+		if not appName:
+			GetCopyBundle(infoPath)
+		else:
+			print(" *** Application Data Obfuscated (Apple Application) ***")
+		print("")
+	else:
+		print(" Application does not exist.")
+		print("")
 	
 def GetAllApps():
 	path = "/var/mobile/Containers/Bundle/Application"
@@ -88,30 +111,29 @@ def GetAllApps():
 				print(" *** Application Data Obfuscated (Apple Application) ***")
 			print(" Directory: " + y)
 			print("")
-			
+
+		
 	
 def Help():
 	print("")
 	print(" Usage: python AppInfo.py [-h]")
 	print("")
-	print(" [-l], --list	List all installed applications.")
-	print(" [-a], --all	Print information of all installed applications.")
-	print(" [-i], --info 	Print information of specified application.")
-	print(" [-h], --help 	Print this message.")
+	print(" -l, --list	List all installed applications.")
+	print(" -a, --all	Print information of all installed applications.")
+	print(" -i, --info 	Print information of specified application.")
+	print(" -b, --bundle-id 	Copy bundle identifier of specified application to clipboard.")
+	print(" -h, --help 	Print this message.")
 	print("")
 	
 def Error():
 	print("")
 	print(" Unrecognized argument: " +  sys.argv[1])
-	print("")
-	print(" Usage: python AppInfo.py [-h]")
-	print("")
-	print(" [-l], --list	List all installed applications.")
-	print(" [-a], --all	Print information of all installed applications.")
-	print(" [-i], --info 	Print information of specified application.")
-	print(" [-h], --help 	Print this message.")
-	print("")
+	Help()
 
+def MissingArg():
+	print("")
+	print(" Missing argument: application name")
+	Help()
 		
 	
 if len(sys.argv) > 1:
@@ -123,8 +145,16 @@ if len(sys.argv) > 1:
 		if len(sys.argv) > 2:
 			GetAllAppInfo()
 			GetApp(sys.argv[2])
+		elif len(sys.argv) > 1:
+			MissingArg()
 	elif sys.argv[1] == "-h" or sys.argv[1] == "--help":
 		Help()
+	elif sys.argv[1] == "-b" or sys.argv[1] == "--bundle-id":
+		if len(sys.argv) > 2:
+			GetAllAppInfo()
+			CopyBundleId(sys.argv[2])
+		elif len(sys.argv) > 1:
+			MissingArg()
 	else:
 		Error()
 else:
