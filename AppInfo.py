@@ -113,7 +113,29 @@ def GetAllApps():
 			print(" Directory: " + y)
 			print("")
 
+def PatchiOS(appName, iOS):
+	if appName in pathDict:
+		appNameApp = "%s.app" % appName
+		appPath = "/var/mobile/Containers/Bundle/Application/%s/%s/" % (pathDict[appName], appNameApp)
+		infoPath = "/var/mobile/Containers/Bundle/Application/%s/%s/Info.plist" % (pathDict[appName], appNameApp)
+		infoFile = open(infoPath, 'r').read()
 		
+		appName = re.findall(r'bplist', infoFile)
+		
+		if not appName:
+				pl = plistlib.readPlist(infoPath)
+				pl["MinimumOSVersion"] = iOS
+				plistlib.writePlist(pl, infoPath)
+				print(" MinimumOSVersion set to %s.") % iOS
+		else:
+			print(" *** Application Data Obfuscated (Apple Application) ***")
+		print("")
+	else:
+		print(" Application does not exist.")
+		print("")
+		
+
+
 	
 def Help():
 	print("")
@@ -122,7 +144,8 @@ def Help():
 	print(" -l, --list	List all installed applications.")
 	print(" -a, --all	Print information of all installed applications.")
 	print(" -i, --info 	Print information of specified application.")
-	print(" -b, --bundle-id 	Copy bundle identifier of specified application to clipboard.")
+	print(" -b, --bundle-id 	Copy the specified application's Bundle Identifier to your clipboard.")
+	print(" -p, --patch-ios 	Modify the specified application's MinimumOSVersion to specified iOS.")
 	print(" -h, --help 	Print this message.")
 	print("")
 	
@@ -136,7 +159,14 @@ def MissingArg():
 	print(" Missing argument: application name")
 	Help()
 		
-	
+
+def ArgHelp():
+	print("")
+	print(" Please specify application name and the iOS version to be set.")
+	print(" E.g. python AppInfo.py --patch-ios Skype 6.0")
+	Help()
+		
+		
 if len(sys.argv) > 1:
 	if sys.argv[1] == "-l" or sys.argv[1] == "--list":
 		ListApps()
@@ -156,6 +186,12 @@ if len(sys.argv) > 1:
 			CopyBundleId(sys.argv[2])
 		elif len(sys.argv) > 1:
 			MissingArg()
+	elif sys.argv[1] == "-p" or sys.argv[1] == "--patch-ios":
+		if len(sys.argv) > 3:
+			GetAllAppInfo()
+			PatchiOS(sys.argv[2], sys.argv[3])
+		else:
+			ArgHelp()
 	else:
 		Error()
 else:
