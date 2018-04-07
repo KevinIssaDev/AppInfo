@@ -8,9 +8,10 @@ Get information about all your installed applications on your iOS device, in sec
 ```
  Usage: python AppInfo.py [-h]
 
--l, --list	List all installed applications.
--a, --all	Print information of all installed applications.
--i, --info 	Print information of specified application.
--b, --bundle-id 	Copy the specified application's Bundle Identifier to your clipboard.
--p, --patch-ios 	Modify the specified application's MinimumOSVersion to specified iOS.
--h, --help 	Print this message.
+ -l, --list    List all installed applications.
+ -a, --all    Print information of all installed applications.
+ -i, --info    Print information of specified application.
+ -g, --get-key    Print the value of specified key from specified application's Info.plist.
+ -ga, --get-all    List all keys in specified application's Info.plist.
+ -b, --bundle-id    Copy the specified application's Bundle Identifier to your clipboard.
+ -h, --help    Print this message.
