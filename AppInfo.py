@@ -137,6 +137,31 @@ def GetKey(appName, pkey):
 		print("")
 		
 		
+def ModKey(appName, pkey, newValue):
+	if appName in pathDict:
+		appNameApp = "%s.app" % appName
+		appPath = "/var/mobile/Containers/Bundle/Application/%s/%s/" % (pathDict[appName], appNameApp)
+		infoPath = "/var/mobile/Containers/Bundle/Application/%s/%s/Info.plist" % (pathDict[appName], appNameApp)
+		infoFile = open(infoPath, 'r').read()
+		
+		appName = re.findall(r'bplist', infoFile)
+		
+		if not appName:
+			pl = plistlib.readPlist(infoPath)
+			if pkey in pl:
+					pl[pkey] = newValue
+					plistlib.writePlist(pl, infoPath)
+					print(" %s set to %s.") % (pkey, newValue)
+			else:
+				print(' Key does not exist.')
+		else:
+			print(" *** Application Data Obfuscated (Apple Application) ***")
+		print("")
+	else:
+		print(" Application does not exist.")
+		print("")	
+
+		
 def AllKeys(appName):
 	if appName in pathDict:
 		appNameApp = "%s.app" % appName
@@ -170,6 +195,7 @@ def Help():
 	print(" -i, --info    Print information of specified application.")
 	print(" -g, --get-key    Print the value of specified key from specified application's Info.plist.")
 	print(" -ga, --get-all    List all keys in specified application's Info.plist.")	
+	print(" -m, --modify-key    Change the value of specified key from specified application's Info.plist.")
 	print(" -b, --bundle-id    Copy the specified application's Bundle Identifier to your clipboard.")
 	print(" -h, --help    Print this message.")
 	print("")
@@ -203,7 +229,12 @@ def AllKeysHelp():
 	print(" Please specify application name.")
 	print(" E.g. python AppInfo.py --get-all Skype")
 	print("")
-		
+	
+def ModHelp():
+	print("")
+	print(" Please specify application name, the key to be changed and the value to set it to.")
+	print(" E.g. python AppInfo.py --modify-key Skype CFBundleDisplayName NewValue")
+	print("")
 		
 		
 if len(sys.argv) > 1:
@@ -237,6 +268,12 @@ if len(sys.argv) > 1:
 			AllKeys(sys.argv[2])
 		else:
 			AllKeysHelp()
+	elif sys.argv[1] == "-m" or sys.argv[1] == "--modify-key":
+		if len(sys.argv) > 4:
+			GetAllAppInfo()
+			ModKey(sys.argv[2], sys.argv[3], sys.argv[4])
+		else:
+			ModHelp()
 	else:
 		Error()
 else:
