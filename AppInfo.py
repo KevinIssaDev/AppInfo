@@ -4,20 +4,20 @@ import plistlib
 import pprint
 
 def SubDirPath (d):
-    return filter(os.path.isdir, [os.path.join(d,f) for f in os.listdir(d)])
-
+    return list(filter(os.path.isdir, [os.path.join(d,f) for f in os.listdir(d)]))
 
 pathDict = {}
 def ListApps():
 	
 	print('')
-	path = "/var/mobile/Containers/Bundle/Application"
+	path = "/var/containers/Bundle/Application"
 	c = SubDirPath(path)
 	for x in c:
 		z = SubDirPath(x)
 		for y in z:
 			filePath = "%s/Info.plist" % y
-			infoFile = open(filePath, 'r').read()
+			with open(filePath, "r", encoding="latin-1") as f:
+				infoFile = f.read()
 			dirNamePretty = re.findall('[^/]*\.app', y)
 			dirNamePretty[0] = re.sub('\.app', "", dirNamePretty[0])
 			print("# " + dirNamePretty[0])
@@ -36,13 +36,14 @@ def PrintInfo(path):
 	
 def GetAllAppInfo():
 	print('')
-	path = "/var/mobile/Containers/Bundle/Application"
+	path = "/var/containers/Bundle/Application"
 	c = SubDirPath(path)
 	for x in c:
 		z = SubDirPath(x)
 		for y in z:
 			filePath = "%s/Info.plist" % y
-			infoFile = open(filePath, 'r').read()
+			with open(filePath, "r", encoding="latin-1") as f:
+				infoFile = f.read()
 			dirSerial = re.sub('\/var\/.*Application.', '', y)
 			dirSerial = re.sub('.[^/]*\.app', '', dirSerial)
 			dirNamePretty = re.findall('[^/]*\.app', y)
@@ -61,9 +62,10 @@ def GetCopyBundle(path):
 def GetApp(appName): 
 	if appName in pathDict:
 		appNameApp = "%s.app" % appName
-		appPath = "/var/mobile/Containers/Bundle/Application/%s/%s/" % (pathDict[appName], appNameApp)
-		infoPath = "/var/mobile/Containers/Bundle/Application/%s/%s/Info.plist" % (pathDict[appName], appNameApp)
-		infoFile = open(infoPath, 'r').read()
+		appPath = "/var/containers/Bundle/Application/%s/%s/" % (pathDict[appName], appNameApp)
+		infoPath = "/var/containers/Bundle/Application/%s/%s/Info.plist" % (pathDict[appName], appNameApp)
+		with open(infoPath, "r", encoding='utf-8') as f:
+			infoFile=f.read()
 		
 		appName = re.findall(r'bplist', infoFile)
 		
@@ -81,9 +83,10 @@ def GetApp(appName):
 def CopyBundleId(appName):
 	if appName in pathDict:
 		appNameApp = "%s.app" % appName
-		appPath = "/var/mobile/Containers/Bundle/Application/%s/%s/" % (pathDict[appName], appNameApp)
-		infoPath = "/var/mobile/Containers/Bundle/Application/%s/%s/Info.plist" % (pathDict[appName], appNameApp)
-		infoFile = open(infoPath, 'r').read()
+		appPath = "/var/containers/Bundle/Application/%s/%s/" % (pathDict[appName], appNameApp)
+		infoPath = "/var/containers/Bundle/Application/%s/%s/Info.plist" % (pathDict[appName], appNameApp)
+		with open(infoPath, "r", encoding='utf-8') as f:
+			infoFile=f.read()
 		
 		appName = re.findall(r'bplist', infoFile)
 		
@@ -97,14 +100,15 @@ def CopyBundleId(appName):
 		print("")
 	
 def GetAllApps():
-	path = "/var/mobile/Containers/Bundle/Application"
+	path = "/var/containers/Bundle/Application"
 	c = SubDirPath(path)
 	
 	for x in c:
 		z = SubDirPath(x)
 		for y in z:
 			filePath = "%s/Info.plist" % y
-			infoFile = open(filePath, 'r').read()
+			with open(filePath, "r", encoding="latin-1") as f:
+				infoFile = f.read()
 			
 			appName = re.findall(r'bplist', infoFile)
 			if not appName:
@@ -117,9 +121,10 @@ def GetAllApps():
 def GetKey(appName, pkey):
 	if appName in pathDict:
 		appNameApp = "%s.app" % appName
-		appPath = "/var/mobile/Containers/Bundle/Application/%s/%s/" % (pathDict[appName], appNameApp)
-		infoPath = "/var/mobile/Containers/Bundle/Application/%s/%s/Info.plist" % (pathDict[appName], appNameApp)
-		infoFile = open(infoPath, 'r').read()
+		appPath = "/var/containers/Bundle/Application/%s/%s/" % (pathDict[appName], appNameApp)
+		infoPath = "/var/containers/Bundle/Application/%s/%s/Info.plist" % (pathDict[appName], appNameApp)
+		with open(infoPath, "r", encoding='utf-8') as f:
+			infoFile=f.read()
 		
 		appName = re.findall(r'bplist', infoFile)
 		
@@ -140,9 +145,10 @@ def GetKey(appName, pkey):
 def ModKey(appName, pkey, newValue):
 	if appName in pathDict:
 		appNameApp = "%s.app" % appName
-		appPath = "/var/mobile/Containers/Bundle/Application/%s/%s/" % (pathDict[appName], appNameApp)
-		infoPath = "/var/mobile/Containers/Bundle/Application/%s/%s/Info.plist" % (pathDict[appName], appNameApp)
-		infoFile = open(infoPath, 'r').read()
+		appPath = "/var/containers/Bundle/Application/%s/%s/" % (pathDict[appName], appNameApp)
+		infoPath = "/var/containers/Bundle/Application/%s/%s/Info.plist" % (pathDict[appName], appNameApp)
+		with open(infoPath, "r", encoding='utf-8') as f:
+			infoFile=f.read()
 		
 		appName = re.findall(r'bplist', infoFile)
 		
@@ -151,7 +157,7 @@ def ModKey(appName, pkey, newValue):
 			if pkey in pl:
 					pl[pkey] = newValue
 					plistlib.writePlist(pl, infoPath)
-					print(" %s set to %s.") % (pkey, newValue)
+					print(" %s set to %s." % (pkey, newValue))
 			else:
 				print(' Key does not exist.')
 		else:
@@ -165,15 +171,16 @@ def ModKey(appName, pkey, newValue):
 def AllKeys(appName):
 	if appName in pathDict:
 		appNameApp = "%s.app" % appName
-		appPath = "/var/mobile/Containers/Bundle/Application/%s/%s/" % (pathDict[appName], appNameApp)
-		infoPath = "/var/mobile/Containers/Bundle/Application/%s/%s/Info.plist" % (pathDict[appName], appNameApp)
-		infoFile = open(infoPath, 'r').read()
+		appPath = "/var/containers/Bundle/Application/%s/%s/" % (pathDict[appName], appNameApp)
+		infoPath = "/var/containers/Bundle/Application/%s/%s/Info.plist" % (pathDict[appName], appNameApp)
+		with open(infoPath, "r", encoding='utf-8') as f:
+			infoFile=f.read()
 		
 		appName = re.findall(r'bplist', infoFile)
 		
 		if not appName:
 				pl = plistlib.readPlist(infoPath)
-				for key, value in pl.items() :
+				for key, value in list(pl.items()) :
 					print('# %s' % key) 
 		else:
 			print(" *** Application Data Obfuscated (Apple Application) ***")
@@ -196,7 +203,7 @@ def Help():
 	print(" -g, --get-key    Print the value of specified key from specified application's Info.plist.")
 	print(" -ga, --get-all    List all keys in specified application's Info.plist.")	
 	print(" -m, --modify-key    Change the value of specified key from specified application's Info.plist.")
-	print(" -b, --bundle-id    Copy the specified application's Bundle Identifier to your clipboard.")
+	print(" -b, --bundle-id    Copy the specified application's Bundle Identifier to your clipboard. (pbcopy required)")
 	print(" -h, --help    Print this message.")
 	print("")
 	
